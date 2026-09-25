@@ -21,3 +21,8 @@
   afnemers, zoals `dashboard.py`. Kolommen hernoem, verwijder of hertype je niet. Is een
   wijziging echt nodig? Stop en vraag het eerst. Een nieuwe kolom toevoegen mag, maar werk
   dan in dezelfde wijziging `tests/integration/test_contract.py` én alle afnemers bij.
+- Raak je `transform.py` of `model.py` aan (ook "alleen voor snelheid"), draai dan
+  `make sim`. Een optimalisatie mag de uitkomst niet veranderen.
+- `tests/simulation/baseline.json` werk je alleen bij met `make baseline REDEN="..."`, en
+  alleen als de verandering bedoeld is en de gebruiker erom vraagt. De drempels in
+  `tests/simulation/test_replay.py` pas je nooit aan.
