@@ -3,7 +3,7 @@ PYTHON ?= python
 export PYTHONPATH := src
 
 .DEFAULT_GOAL := help
-.PHONY: help stap klaar reset setup run dashboard test it lint all
+.PHONY: help stap klaar reset setup run dashboard test it sim baseline lint all
 
 help: ## Toon alle commando's
 	@grep -hE '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  make %-10s %s\n", $$1, $$2}'
@@ -40,8 +40,14 @@ test: ## Unit tests: snel, draai ze na elke wijziging
 it: ## Integratietests: de echte pipeline op een tijdelijke DuckDB
 	$(PYTHON) -m pytest tests/integration -m integration -q
 
+sim: ## Simulatie: speel een geseede dag af en vergelijk met de baseline
+	$(PYTHON) -m pytest tests/simulation -m simulation -q
+
+baseline: ## Werk de simulatie-baseline bij, bijv. make baseline REDEN="beter model"
+	$(PYTHON) scripts/update_baseline.py --reden "$(REDEN)"
+
 lint: ## Ruff: stijl en veelgemaakte fouten
 	$(PYTHON) -m ruff check .
 	$(PYTHON) -m ruff format --check .
 
-all: lint test it ## Alles: lint + test + it
+all: lint test it sim ## Alles: lint + test + it + sim

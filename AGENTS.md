@@ -5,6 +5,8 @@
 - `make test`: unit tests (duurt enkele seconden). Draai ze na elke wijziging.
 - `make it`: integratietests (echte DuckDB in een tijdelijke map). Draai ze voordat je
   zegt dat je klaar bent.
+- `make sim`: simulatie; speelt een geseede synthetische dag (~5.000 regels) af en
+  vergelijkt met `tests/simulation/baseline.json`.
 
 ## Regels
 

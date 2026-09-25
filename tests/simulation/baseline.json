@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "seed": 42,
+    "days": 15,
+    "rows_per_day": 5000
+  },
+  "replay_date": "2026-09-17",
+  "order_lines": 4951,
+  "store_totals_eur": {
+    "S01": 16961.86,
+    "S02": 27196.98,
+    "S03": 15662.82,
+    "S04": 18496.97,
+    "S05": 18467.64,
+    "S06": 32548.19,
+    "S07": 16202.22,
+    "S08": 25490.6
+  },
+  "total_eur": 171027.28,
+  "mape_pct": 12.18,
+  "reason": "Eerste baseline: seed 42, 15 dagen, ~5.000 orderregels per dag"
+}
