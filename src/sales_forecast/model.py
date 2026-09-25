@@ -7,6 +7,8 @@ from datetime import date, timedelta
 
 import duckdb
 
+from sales_forecast.utils.dates import parse_date
+
 WINDOW_DAYS = 7
 
 
@@ -48,13 +50,17 @@ def mape(actual: Sequence[float], predicted: Sequence[float]) -> float:
 
 def forecast(
     conn: duckdb.DuckDBPyConnection,
-    as_of: date | None = None,
+    as_of: date | str | None = None,
     window: int = WINDOW_DAYS,
 ) -> dict[str, float]:
-    """Voorspel per winkel de omzet voor de dag ná `as_of` (standaard: de laatste dag met data)."""
+    """Voorspel per winkel de omzet voor de dag ná `as_of` (standaard: de laatste dag met data).
+
+    `as_of` mag een `date` zijn of tekst, zoals "2026-09-14" of "14-09-2026".
+    """
+    cutoff = parse_date(as_of) if as_of is not None else None
     predictions: dict[str, float] = {}
     for store_id, series in store_revenue_by_day(conn).items():
-        values = [revenue for day, revenue in series if as_of is None or day <= as_of]
+        values = [revenue for day, revenue in series if cutoff is None or day <= cutoff]
         if values:
             predictions[store_id] = round(moving_average(values, window), 2)
     return predictions
@@ -62,15 +68,20 @@ def forecast(
 
 def backtest(
     conn: duckdb.DuckDBPyConnection,
-    day: date | None = None,
+    day: date | str | None = None,
     window: int = WINDOW_DAYS,
 ) -> float:
-    """MAPE van de voorspelling voor `day` (standaard: laatste dag), op basis van eerdere dagen."""
+    """MAPE van de voorspelling voor `day` (standaard: laatste dag), op basis van eerdere dagen.
+
+    `day` mag een `date` zijn of tekst, net als `as_of` bij `forecast`.
+    """
     history = store_revenue_by_day(conn)
     if not history:
         raise ValueError("daily_sales is leeg")
     if day is None:
         day = max(d for series in history.values() for d, _ in series)
+    else:
+        day = parse_date(day)
 
     predictions = forecast(conn, as_of=day - timedelta(days=1), window=window)
     actual, predicted = [], []

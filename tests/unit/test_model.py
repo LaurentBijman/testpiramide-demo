@@ -75,3 +75,18 @@ def test_forecast_as_of_ignores_later_days(daily_sales):
 def test_backtest_last_day(daily_sales):
     # S01: voorspeld 20 (gem. 10, 20, 30), werkelijk 40 -> 50%; S02: 50 vs 50 -> 0%.
     assert backtest(daily_sales) == pytest.approx(25.0)
+
+
+@pytest.mark.parametrize("as_of", ["2026-09-02", "02-09-2026", "02/09/2026"])
+def test_forecast_accepts_as_of_as_text(daily_sales, as_of):
+    assert forecast(daily_sales, as_of=as_of) == {"S01": 15.0, "S02": 50.0}
+
+
+@pytest.mark.parametrize("day", ["2026-09-04", "04-09-2026"])
+def test_backtest_accepts_day_as_text(daily_sales, day):
+    assert backtest(daily_sales, day=day) == pytest.approx(25.0)
+
+
+def test_forecast_rejects_unknown_date_text(daily_sales):
+    with pytest.raises(ValueError):
+        forecast(daily_sales, as_of="volgende week")
