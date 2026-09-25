@@ -15,3 +15,7 @@
 - Een falende test maak je groen door de code te repareren, niet de test. Asserts
   afzwakken, tests verwijderen of `skip`/`xfail` toevoegen mag niet. Denk je dat de test
   zelf fout is? Stop en leg uit waarom, in plaats van hem aan te passen.
+- `daily_sales` (`date`, `store_id`, `cust_id`, `revenue_eur`) is een contract met
+  afnemers, zoals `dashboard.py`. Kolommen hernoem, verwijder of hertype je niet. Is een
+  wijziging echt nodig? Stop en vraag het eerst. Een nieuwe kolom toevoegen mag, maar werk
+  dan in dezelfde wijziging `tests/integration/test_contract.py` én alle afnemers bij.
