@@ -1,0 +1,37 @@
+[project]
+name = "sales-forecast"
+version = "0.1.0"
+description = "Demo-pijplijn voor de testpiramide: ingest -> transform -> model op DuckDB"
+requires-python = ">=3.12"
+dependencies = ["duckdb>=1.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "pre-commit>=3.7"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra --strict-markers"
+markers = [
+    "unit: snel, geen bestanden of netwerk; draait bij elke wijziging (make test)",
+    "integration: echte DuckDB in een tijdelijke map; draait bij elke pull request (make it)",
+    "simulation: speelt een geseede synthetische dag af tegen een baseline; draait 's nachts (make sim)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sales_forecast"]

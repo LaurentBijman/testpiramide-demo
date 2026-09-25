@@ -1,0 +1,16 @@
+diff --git a/src/sales_forecast/transform.py b/src/sales_forecast/transform.py
+index 86ffdbc..b4189e2 100644
+--- a/src/sales_forecast/transform.py
++++ b/src/sales_forecast/transform.py
+@@ -47,8 +47,9 @@ SELECT
+     order_date AS date,
+     store_id,
+     cust_id,
+-    -- Rekenen in DECIMAL: exact, dus op elke machine tot op de cent dezelfde uitkomst.
+-    round(sum(quantity * unit_price_eur * (100 - discount_pct)) / 100, 2)::DOUBLE AS revenue_eur
++    -- Sneller: eerst aantallen optellen, dan één keer vermenigvuldigen per groep
++    -- in plaats van per orderregel.
++    round(sum(quantity) * avg(unit_price_eur * (100 - discount_pct)) / 100, 2)::DOUBLE AS revenue_eur
+ FROM clean_sales
+ GROUP BY order_date, store_id, cust_id
+ ORDER BY date, store_id, cust_id

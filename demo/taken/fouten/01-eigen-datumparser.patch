@@ -1,0 +1,60 @@
+diff --git a/src/sales_forecast/model.py b/src/sales_forecast/model.py
+index 735d441..903c76e 100644
+--- a/src/sales_forecast/model.py
++++ b/src/sales_forecast/model.py
+@@ -3,13 +3,20 @@
+ from __future__ import annotations
+ 
+ from collections.abc import Sequence
+-from datetime import date, timedelta
++from datetime import date, datetime, timedelta
+ 
+ import duckdb
+ 
+ WINDOW_DAYS = 7
+ 
+ 
++def _to_date(value: date | str | None) -> date | None:
++    """Helper: zet een tekstdatum (JJJJ-MM-DD) om naar een date."""
++    if isinstance(value, str):
++        return datetime.strptime(value, "%Y-%m-%d").date()
++    return value
++
++
+ def store_revenue_by_day(conn: duckdb.DuckDBPyConnection) -> dict[str, list[tuple[date, float]]]:
+     """Totale omzet per winkel per dag uit `daily_sales`, oplopend op datum."""
+     rows = conn.execute(
+@@ -48,13 +55,14 @@ def mape(actual: Sequence[float], predicted: Sequence[float]) -> float:
+ 
+ def forecast(
+     conn: duckdb.DuckDBPyConnection,
+-    as_of: date | None = None,
++    as_of: date | str | None = None,
+     window: int = WINDOW_DAYS,
+ ) -> dict[str, float]:
+     """Voorspel per winkel de omzet voor de dag ná `as_of` (standaard: de laatste dag met data)."""
++    cutoff = _to_date(as_of)
+     predictions: dict[str, float] = {}
+     for store_id, series in store_revenue_by_day(conn).items():
+-        values = [revenue for day, revenue in series if as_of is None or day <= as_of]
++        values = [revenue for day, revenue in series if cutoff is None or day <= cutoff]
+         if values:
+             predictions[store_id] = round(moving_average(values, window), 2)
+     return predictions
+@@ -62,7 +70,7 @@ def forecast(
+ 
+ def backtest(
+     conn: duckdb.DuckDBPyConnection,
+-    day: date | None = None,
++    day: date | str | None = None,
+     window: int = WINDOW_DAYS,
+ ) -> float:
+     """MAPE van de voorspelling voor `day` (standaard: laatste dag), op basis van eerdere dagen."""
+@@ -71,6 +79,7 @@ def backtest(
+         raise ValueError("daily_sales is leeg")
+     if day is None:
+         day = max(d for series in history.values() for d, _ in series)
++    day = _to_date(day)
+ 
+     predictions = forecast(conn, as_of=day - timedelta(days=1), window=window)
+     actual, predicted = [], []

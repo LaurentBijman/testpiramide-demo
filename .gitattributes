@@ -1,0 +1,2 @@
+# Altijd LF, ook op Windows: nodig voor Makefile, shellscripts en `git apply` van de patches.
+* text=auto eol=lf

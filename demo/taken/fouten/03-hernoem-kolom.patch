@@ -1,0 +1,27 @@
+diff --git a/src/sales_forecast/transform.py b/src/sales_forecast/transform.py
+index 86ffdbc..f86f072 100644
+--- a/src/sales_forecast/transform.py
++++ b/src/sales_forecast/transform.py
+@@ -1,6 +1,6 @@
+ """Transform: schoon de ruwe verkopen op en aggregeer naar omzet per dag, winkel en klant.
+ 
+-Output is de tabel `daily_sales` (date, store_id, cust_id, revenue_eur).
++Output is de tabel `daily_sales` (date, store_id, customer_id, revenue_eur).
+ Het dashboard en het model lezen deze tabel op kolomnaam: het schema is een contract.
+ """
+ 
+@@ -46,12 +46,12 @@ CREATE OR REPLACE TABLE daily_sales AS
+ SELECT
+     order_date AS date,
+     store_id,
+-    cust_id,
++    cust_id AS customer_id,
+     -- Rekenen in DECIMAL: exact, dus op elke machine tot op de cent dezelfde uitkomst.
+     round(sum(quantity * unit_price_eur * (100 - discount_pct)) / 100, 2)::DOUBLE AS revenue_eur
+ FROM clean_sales
+ GROUP BY order_date, store_id, cust_id
+-ORDER BY date, store_id, cust_id
++ORDER BY date, store_id, customer_id
+ """
+ 
+ 

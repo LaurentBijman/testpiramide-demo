@@ -1,0 +1,14 @@
+# Gegenereerde data (synthetisch, altijd opnieuw te maken met `make run`)
+/data/
+
+# Python
+__pycache__/
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Tools
+.pytest_cache/
+.ruff_cache/

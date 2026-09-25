@@ -1,0 +1,13 @@
+diff --git a/src/sales_forecast/transform.py b/src/sales_forecast/transform.py
+index 86ffdbc..3f98529 100644
+--- a/src/sales_forecast/transform.py
++++ b/src/sales_forecast/transform.py
+@@ -37,8 +37,6 @@ WHERE order_date IS NOT NULL
+   AND quantity > 0
+   AND unit_price_eur >= 0
+   AND discount_pct BETWEEN 0 AND 100
+--- Kassa's sturen soms een orderregel twee keer: die telt maar één keer.
+-QUALIFY row_number() OVER (PARTITION BY order_id, line_no ORDER BY order_date) = 1
+ """
+ 
+ AGGREGATE_SQL = """
