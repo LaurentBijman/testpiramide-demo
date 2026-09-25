@@ -3,7 +3,7 @@ PYTHON ?= python
 export PYTHONPATH := src
 
 .DEFAULT_GOAL := help
-.PHONY: help stap klaar reset setup run dashboard test lint all
+.PHONY: help stap klaar reset setup run dashboard test it lint all
 
 help: ## Toon alle commando's
 	@grep -hE '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  make %-10s %s\n", $$1, $$2}'
@@ -37,8 +37,11 @@ dashboard: ## Toon het dashboard (leest daily_sales)
 test: ## Unit tests: snel, draai ze na elke wijziging
 	$(PYTHON) -m pytest tests/unit -m unit -q
 
+it: ## Integratietests: de echte pipeline op een tijdelijke DuckDB
+	$(PYTHON) -m pytest tests/integration -m integration -q
+
 lint: ## Ruff: stijl en veelgemaakte fouten
 	$(PYTHON) -m ruff check .
 	$(PYTHON) -m ruff format --check .
 
-all: lint test ## Alles: lint + test
+all: lint test it ## Alles: lint + test + it
