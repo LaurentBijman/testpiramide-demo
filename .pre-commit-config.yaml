@@ -1,0 +1,21 @@
+# Draait bij elke `git commit` (eenmalig aanzetten met: make hooks).
+# Bewust alleen de snelle laag: ruff + unit tests. Integratie en simulatie draaien in CI.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: python -m ruff check --force-exclude
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: python -m ruff format --check --force-exclude
+        language: system
+        types: [python]
+      - id: unit-tests
+        name: unit tests (make test)
+        entry: python -m pytest tests/unit -m unit -q
+        language: system
+        pass_filenames: false
+        always_run: true

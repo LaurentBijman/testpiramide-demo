@@ -3,7 +3,7 @@ PYTHON ?= python
 export PYTHONPATH := src
 
 .DEFAULT_GOAL := help
-.PHONY: help stap klaar reset setup run dashboard test it sim baseline lint all
+.PHONY: help stap klaar reset setup run dashboard test it sim baseline lint all hooks
 
 help: ## Toon alle commando's
 	@grep -hE '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  make %-10s %s\n", $$1, $$2}'
@@ -51,3 +51,6 @@ lint: ## Ruff: stijl en veelgemaakte fouten
 	$(PYTHON) -m ruff format --check .
 
 all: lint test it sim ## Alles: lint + test + it + sim
+
+hooks: ## Zet pre-commit aan: ruff + unit tests bij elke commit
+	$(PYTHON) -m pre_commit install
