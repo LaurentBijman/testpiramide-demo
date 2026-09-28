@@ -20,12 +20,15 @@ Klik op **Create fork**.
 **Codespace (aanbevolen, niets te installeren):** in je fork op **Code → Codespaces →
 Create codespace on main**. Alles wordt automatisch geïnstalleerd (`.devcontainer/`).
 
-**Lokaal in VS Code:** je hebt Python 3.12, git en `make` nodig (op Windows: gebruik WSL of een Codespace).
+**Lokaal in VS Code:** je hebt [uv](https://docs.astral.sh/uv/), git en `make` nodig.
+uv installeert Python 3.12 voor je. Op Windows: lees eerst [Bugs](#bugs).
 
 ```bash
 git clone https://github.com/<jouw-naam>/testpiramide-demo.git
 cd testpiramide-demo
-python3.12 -m venv .venv && source .venv/bin/activate
+uv python install 3.12
+uv venv --python 3.12 --seed   # --seed installeert pip in de venv
+.venv\Scripts\activate          # Windows; macOS/Linux: source .venv/bin/activate
 make setup
 ```
 
@@ -63,3 +66,33 @@ Volg daarna de presentator. Kopieer de commando's uit de blokken "Jij doet mee".
 - [DEMO.md](DEMO.md): het volledige draaiboek, met verwachte uitkomsten per stap
 - [demo/taken/](demo/taken/): de prompts voor je agent, en in [fouten/](demo/taken/fouten/) de patches als terugvaloptie
 - [oefening/template-AGENTS.md](oefening/template-AGENTS.md): huiswerk, ontwerp de piramide voor je eigen project
+
+## Bugs
+
+Bekende problemen als je lokaal werkt met uv op Windows (PowerShell). In een Codespace,
+op macOS/Linux of in WSL heb je hier geen last van.
+
+**1. `make help`, `make stap` en `make klaar` falen; `make reset` toont letterlijk `$(git branch --show-current)`.**
+Het Makefile gebruikt Unix-tools (`sh`, `grep`, `awk`). Zonder `sh` valt `make` op Windows
+terug op `cmd.exe`, en die kent ze niet:
+
+```
+'grep' is not recognized as an internal or external command
+process_begin: CreateProcess(NULL, sh scripts/ga-naar.sh stap 0, ...) failed.
+```
+
+*Fix:* zet de Unix-tools van Git for Windows vooraan in je PATH, in elke nieuwe terminal
+(na het activeren van de venv):
+
+```powershell
+$env:Path = "C:\Program Files\Git\usr\bin;" + $env:Path
+```
+
+`make` vindt dan `sh.exe` en gebruikt die als shell. Dit werkt op alle demo-branches,
+omdat je het Makefile niet aanpast. Heb je nog geen `make`? `winget install ezwinports.make`.
+
+**2. `make reset` meldt `failed to remove ...: Permission denied` na een wissel van branch.**
+Bij het wisselen blijven soms lege mappen achter (bijv. `docs/`, `.github/workflows/`),
+die Windows niet kan verwijderen zolang OneDrive of VS Code ze vasthoudt. Dit is onschuldig:
+de reset zelf is gelukt, `git status` is schoon en `make stap` blijft werken.
+*Fix:* negeer de melding, of clone de repo buiten een OneDrive-map (bijv. `C:\dev\`).
